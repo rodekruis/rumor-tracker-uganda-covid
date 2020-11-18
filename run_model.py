@@ -22,6 +22,7 @@ from utils import preprocess, BreakIt, produce_mapping
 from apiclient import discovery
 from google.oauth2 import service_account
 from datetime import datetime
+from time import sleep
 
 
 def main():
@@ -125,6 +126,10 @@ def main():
 
     print("Forecast update was a Success!", datetime.now())
 
+
 if __name__ == "__main__":
-    main()
+    n = 5
+    while n > 0:
+        main()
+        sleep(86400)
 
