@@ -82,7 +82,7 @@ def main():
         responses = len(text[text.topic_num == topic_num])
         if not text_topic.empty:
             df = df.append(pd.Series({"topic number": int(topic_num),
-                                      "frequency (%)": frequency * 100.,
+                                      "frequency (%)": int(frequency * 100.),
                                       "number of responses": responses}), ignore_index=True)
     df = df.sort_values(by=['frequency (%)'], ascending=False)
 
@@ -96,8 +96,8 @@ def main():
     df_results["topic number"] = df_results["topic number"].astype(int)
 
     for ix, row in df_results.iterrows():
-      df_results.at[ix, "frequency (%)"] = df[df["topic number"] == row["topic number"]]["frequency (%)"].values[0]
-      df_results.at[ix, "frequency (%)"] = df[df["topic number"] == row["topic number"]]["number of responses"].values[0]
+        df_results.at[ix, "frequency (%)"] = df[df["topic number"] == row["topic number"]]["frequency (%)"].values[0]
+        df_results.at[ix, "number of responses"] = df[df["topic number"] == row["topic number"]]["number of responses"].values[0]
 
     # reformat data and push to google sheets
     data_to_upload = [['frequency (%)', 'number of responses']] + \
