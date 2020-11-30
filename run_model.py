@@ -42,19 +42,27 @@ def main():
     df = df.replace('None', '')
     df = df.replace(np.nan, '')
     df["rumors"] = df[4] + df[5]
+    df_input = df.copy()
 
     text = df["rumors"]
     len_original = len(text)
-    text = text[text != 'None'].astype(str)
-    text = text.tolist()
-    for index, value in enumerate(text):
-        split_text = value.split('\n')
-        if len(split_text) > 1:
-            text[index] = split_text[0]
+    text_split = pd.DataFrame()
+    for index, row in df.iterrows():
+        split_text = row['rumors'].split('\n')
+        if len(split_text) > 0:
+            text_split = text_split.append(pd.Series({'text': split_text[0],
+                                                      'survey_id': index}), ignore_index=True)
             for more in split_text[1:]:
-                text.extend(more)
-    text = pd.Series(text)
-    text = text[text.str.len() > 4]
+                text_split = text_split.append(pd.Series({'text': more,
+                                                          'survey_id': index}), ignore_index=True)
+    text_split = text_split[text_split.text != 'None']
+    text_split = text_split[text_split.text != 'None ']
+    text_split = text_split[text_split.text.str.len() > 4]
+    text_split = text_split.reset_index(drop=True)
+    text = text_split['text']
+    print(df["rumors"])
+    print(text_split[['text', 'survey_id']])
+    print(len(text))
 
     # pre-process text
     processed_ser = text.map(preprocess)
@@ -88,23 +96,16 @@ def main():
     df = df.sort_values(by=['frequency (%)'], ascending=False)
 
     # update data
-    rangeName = 'output!D:F'
-    result = service.spreadsheets().values().get(
-        spreadsheetId=spreadsheetId, range=rangeName).execute()
-    values = result.get('values', [])
-    df_results = pd.DataFrame.from_records(values)[1:] # convert to pandas dataframe
-    df_results = df_results.rename(columns={0: "frequency (%)", 1: "number of responses", 2: "topic number"})
-    df_results["topic number"] = df_results["topic number"].astype(int)
 
-    for ix, row in df_results.iterrows():
-        df_results.at[ix, "frequency (%)"] = df[df["topic number"] == row["topic number"]]["frequency (%)"].values[0]
-        df_results.at[ix, "number of responses"] = df[df["topic number"] == row["topic number"]]["number of responses"].values[0]
+    # add topic number to individual entries
+    df_input['topic_number'] = np.nan
+    for ix, row in text_split.iterrows():
+        survey_id = int(row['survey_id'])
+        df_input.at[survey_id, 'topic_number'] = matched_topic_list[ix]
 
-    # reformat data and push to google sheets
-    data_to_upload = [['frequency (%)', 'number of responses']] + \
-                     df_results[['frequency (%)', 'number of responses']].values.tolist()
-
-    TargetRangeName = 'output!D:E'
+    data_to_upload = [['topic number']] + \
+                     df_input[['topic_number']].values.tolist()
+    TargetRangeName = 'input!G:G'
     body = {
         "range": TargetRangeName,
         "values": data_to_upload
@@ -113,16 +114,42 @@ def main():
     result = service.spreadsheets().values().update(
         spreadsheetId=spreadsheetId, range=TargetRangeName, valueInputOption=value_input_option, body=body).execute()
 
-    # add metadata
-    metadata = [[datetime.now().strftime("%m/%d/%Y, %H:%M:%S")]]
-    TargetRangeName = 'metadata!A:A'
-    body = {
-        "range": TargetRangeName,
-        "values": metadata
-    }
-    value_input_option = 'USER_ENTERED'
-    result = service.spreadsheets().values().update(
-        spreadsheetId=spreadsheetId, range=TargetRangeName, valueInputOption=value_input_option, body=body).execute()
+    # update the output sheet with aggregated numbers
+    # rangeName = 'output!D:F'
+    # result = service.spreadsheets().values().get(
+    #     spreadsheetId=spreadsheetId, range=rangeName).execute()
+    # values = result.get('values', [])
+    # df_results = pd.DataFrame.from_records(values)[1:] # convert to pandas dataframe
+    # df_results = df_results.rename(columns={0: "frequency (%)", 1: "number of responses", 2: "topic number"})
+    # df_results["topic number"] = df_results["topic number"].astype(int)
+    #
+    # for ix, row in df_results.iterrows():
+    #     df_results.at[ix, "frequency (%)"] = df[df["topic number"] == row["topic number"]]["frequency (%)"].values[0]
+    #     df_results.at[ix, "number of responses"] = df[df["topic number"] == row["topic number"]]["number of responses"].values[0]
+    #
+    # # reformat data and push to google sheets
+    # data_to_upload = [['frequency (%)', 'number of responses']] + \
+    #                  df_results[['frequency (%)', 'number of responses']].values.tolist()
+    #
+    # TargetRangeName = 'output!D:E'
+    # body = {
+    #     "range": TargetRangeName,
+    #     "values": data_to_upload
+    # }
+    # value_input_option = 'USER_ENTERED'
+    # result = service.spreadsheets().values().update(
+    #     spreadsheetId=spreadsheetId, range=TargetRangeName, valueInputOption=value_input_option, body=body).execute()
+    #
+    # # add metadata
+    # metadata = [[datetime.now().strftime("%m/%d/%Y, %H:%M:%S")]]
+    # TargetRangeName = 'metadata!A:A'
+    # body = {
+    #     "range": TargetRangeName,
+    #     "values": metadata
+    # }
+    # value_input_option = 'USER_ENTERED'
+    # result = service.spreadsheets().values().update(
+    #     spreadsheetId=spreadsheetId, range=TargetRangeName, valueInputOption=value_input_option, body=body).execute()
 
     print("Forecast update was a Success!", datetime.now())
 
