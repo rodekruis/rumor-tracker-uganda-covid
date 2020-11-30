@@ -61,9 +61,6 @@ def main():
     text_split = text_split[text_split.text.str.len() > 4]
     text_split = text_split.reset_index(drop=True)
     text = text_split['text']
-    print(df["rumors"])
-    print(text_split[['text', 'survey_id']])
-    print(len(text))
 
     # pre-process text
     processed_ser = text.map(preprocess)
