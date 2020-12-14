@@ -7,6 +7,7 @@ Built to support Uganda Red Cross Society (URCS) during COVID response.
 Rumors and fake news on COVID are being collected by volunteers of URCS around the country. This repo contains the code to build & run a model which:
 1. Groups short messages: rumors and fake news
 2. Assign a topic and a representative example to each group
+
 Built on top of [GSDMM: short text clustering](https://github.com/rwalk/gsdmm)
 
 ## Usage
