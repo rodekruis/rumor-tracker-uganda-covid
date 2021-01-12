@@ -44,6 +44,11 @@ def main():
     df["rumors"] = df[4] + df[5]
     df_input = df.copy()
 
+    df = df[df.rumors != 'None']
+    df = df[df.rumors != 'None ']
+    df = df[df.rumors != 'No rumors']
+    df = df[df.rumors.str.len() > 4]
+
     text = df["rumors"]
     len_original = len(text)
     text_split = pd.DataFrame()
@@ -55,10 +60,6 @@ def main():
             for more in split_text[1:]:
                 text_split = text_split.append(pd.Series({'text': more,
                                                           'survey_id': index}), ignore_index=True)
-    text_split = text_split[text_split.text != 'None']
-    text_split = text_split[text_split.text != 'None ']
-    text_split = text_split[text_split.text != 'No rumors']
-    text_split = text_split[text_split.text.str.len() > 4]
     text_split = text_split.reset_index(drop=True)
     text = text_split['text']
 
