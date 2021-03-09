@@ -1,7 +1,7 @@
 # rumor-tracker-uganda-covid
-Group rumors about COVID in topics
+Scripts to group rumors about COVID-19 into topics.
 
-Built to support Uganda Red Cross Society (URCS) during COVID response. 
+Built to support Uganda Red Cross Society (URCS) during COVID-19 response. 
 
 ## Introduction
 Rumors and fake news on COVID are being collected by volunteers of URCS around the country. This repo contains the code to build & run a model which:
@@ -11,7 +11,7 @@ Rumors and fake news on COVID are being collected by volunteers of URCS around t
 Built on top of [GSDMM: short text clustering](https://github.com/rwalk/gsdmm)
 
 ## Usage
-rumors (input) and topics (output) are stored in [Google Ssheets](https://docs.google.com/spreadsheets/d/18PwsExSVerYzTxGxarLwyGkKIVT2QJCobCnoeLYXwjM/edit#gid=0), access credentials are stored in `service_account_key.json` (ask Jacopo).
+rumors (input) and topics (output) are stored in [Google Ssheets](https://docs.google.com/spreadsheets/d/18PwsExSVerYzTxGxarLwyGkKIVT2QJCobCnoeLYXwjM/edit#gid=0), access credentials are stored in `service_account_key.json` (ask [Jacopo](jmargutti@redcross.nl)).
 
 Run the model with
 ```
