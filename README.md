@@ -1,5 +1,5 @@
 # rumor-tracker-uganda-covid
-Scripts to group rumors about COVID-19 into topics.
+Scripts to group rumors and fake news about COVID-19 into topics.
 
 Built to support Uganda Red Cross Society (URCS) during COVID-19 response. 
 
