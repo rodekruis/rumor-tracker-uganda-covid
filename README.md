@@ -17,5 +17,5 @@ Rumors (input) and topics (output) are stored in [Google Sheets](https://docs.go
 
 Run the model with
 ```
-python represent_simple.py
+python run_model.py
 ```
